@@ -1,0 +1,31 @@
+#!/bin/bash
+if [[ $1 -eq 1 ]]
+then
+    echo "set x xval"
+    echo "set x xvalue"
+    echo "incr counter"
+    echo "incr counter"
+    echo "incr counter"
+    echo "incr counter"
+    echo "incr counter"
+    echo "incr counter"
+    echo "incr counter"
+    echo "set y yval"
+    echo "ping"
+    echo "incr counter"
+    echo "set z zval"
+    echo "shutdown nosave"
+else
+    echo "get x"
+    echo "get y"
+    echo "get counter"
+    echo "incr counter"
+    echo "incr counter"
+    echo "incr counter"
+    echo "set x xvalues"
+    echo "set z zvalue"
+    echo "get z"
+    echo "get x"
+    echo "get y"
+    echo "shutdown save"
+fi 
