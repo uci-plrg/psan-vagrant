@@ -16,7 +16,7 @@ Our workflow has four primary parts: (1) creating a virtual machine and installi
     $ vagrant plugin install vagrant-disksize
 ```
 
-3. Clone this repository into the local machine and go to the *pmrace-vagrant* folder:
+3. Clone this repository into the local machine and go to the *psan-vagrant* folder:
 
 ```
     $ git clone https://github.com/uci-plrg/psan-vagrant.git

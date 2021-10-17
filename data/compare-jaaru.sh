@@ -74,7 +74,7 @@ function fast_fair_bug_2 {
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	timeout 10 ./run.sh ./example 2 2 >> $BUGDIR/FAST_FAIR-bug-2.log
 	make clean &> /dev/null
-        #git checkout -- btree.h
+        git checkout -- btree.h
         git checkout -- run.sh
 }
 
@@ -83,7 +83,7 @@ function fast_fair_bugs {
 	sed -i "3iBUGFLAG=''" Makefile
 	sed -i '8s/$/ $(BUGFLAG)/' Makefile
 	
-	#fast_fair_bug_1
+	fast_fair_bug_1
 	fast_fair_bug_2
 
 	git checkout -- Makefile
@@ -91,11 +91,60 @@ function fast_fair_bugs {
 	cd ..
 }
 
+function p_art_bug_1 {
+	sed -i '87d' ../Epoche.h
+	sed -i '9d' ../Epoche.h
+	make -j &> /dev/null
+	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
+	timeout 10 ./run.sh ./example 9 5 &> $BUGDIR/P-ART-1.log
+	make clean &> /dev/null
+	sed -i '3d' run.sh
+	git checkout -- ../Epoche.h
+}
+
+function p_art_bug_2 {
+	sed -i '26d' ../Tree.cpp
+	sed -i '9d' ../Epoche.h
+	make -j &> /dev/null
+	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
+	timeout 10 ./run.sh ./example 2 2 &> $BUGDIR/P-ART-2.log
+	make clean &> /dev/null
+        sed -i '3d' run.sh
+	git checkout -- ../Epoche.h
+	git checkout -- ../Tree.cpp
+}
+
+function p_art_bug_3 {
+	sed -i '43d' ../example.cpp
+	sed -i '9d' ../Epoche.h
+	make -j &> /dev/null
+	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
+	timeout 30 ./run.sh ./example 2 2 &> $BUGDIR/P-ART-3.log
+	make clean &> /dev/null
+        sed -i '3d' run.sh	
+	git checkout -- ../Epoche.h
+        git checkout -- ../example.cpp
+}
+
+function p_art_bugs {
+	cd P-ART
+	rm -rf build
+	mkdir build
+	cd build
+	cmake CMAKE_CXX_FLAGS= -DCMAKE_C_COMPILER=/home/vagrant/pmcheck-vmem/Test/gcc -DCMAKE_CXX_COMPILER=/home/vagrant/pmcheck-vmem/Test/g++ -DCMAKE_C_FLAGS=-fheinous-gnu-extensions ..
+	
+	p_art_bug_1
+	p_art_bug_2
+	p_art_bug_3
+
+	cd ../../
+}
+
 function compare_psan_jaaru {
 	setup_result_dir
-	#cceh_bugs
+	cceh_bugs
 	fast_fair_bugs
-	#p_art_bugs
+	p_art_bugs
 	#p_bwtree_bugs
 	#p_clht_bugs
 	#p_masstree_bugs
@@ -105,40 +154,6 @@ function compare_psan_jaaru {
 compare_psan_jaaru
 exit
 
-# 2nd bug
-sed -i "188 c\#ifndef MYBUG" btree.h
-make BUGFLAG=-DMYBUG=1
-timeout 10 ./run.sh ./example 2 2 >> $BUGDIR/FAST_FAIR-bug-2.log
-sed -i "188 c\#ifdef BUGFIX" btree.h
-# Third bug
-sed -i "1851 c\#ifndef MYBUG" btree.h
-make BUGFLAG=-DMYBUG=1
-timeout 10 ./run.sh ./example 2 2 >> $BUGDIR/FAST_FAIR-bug-3.log
-sed -i "1851 c\#ifdef BUGFIX" btree.h
-sed -i '3d' run.sh
-git checkout -- Makefile
-sed -i 's/CXX=.*/CXX=~\/pmcheck-vmem\/Test\/g++/g' Makefile
-cd ..
-
-############################### Bugs in  P-ART
-cd P-ART
-rm -rf build
-mkdir build
-sed -i '4iset(CMAKE_CXX_FLAGS "-DMYBUG=1")' CMakeLists.txt
-cd build
-cmake CMAKE_CXX_FLAGS=-DMYBUG=1 -DCMAKE_C_COMPILER=/home/vagrant/pmcheck-vmem/Test/gcc -DCMAKE_CXX_COMPILER=/home/vagrant/pmcheck-vmem/Test/g++ -DCMAKE_C_FLAGS=-fheinous-gnu-extensions ..
-# 1st Bug
-sed -i "77 c\#ifndef MYBUG" ../Epoche.h
-sed -i '3iexport PMCheck="-f11"' run.sh
-make -j
-timeout 10 ./run.sh ./example 9 5 &> $BUGDIR/P-ART-1.log
-sed -i "77 c\#ifdef BUGFIX" ../Epoche.h
-sed -i '3d' run.sh
-# 2nd Bug
-sed -i "25 c\#ifndef MYBUG" ../Tree.cpp
-make -j
-timeout 10 ./run.sh ./example 2 2 &> $BUGDIR/P-ART-2.log
-sed -i "25 c\#ifdef BUGFIX" ../Tree.cpp
 # 3rd Bug
 sed -i "46 c\#ifndef MYBUG" ../example.cpp
 sed -i '3iexport PMCheck="-f11"' run.sh
@@ -148,9 +163,6 @@ if [ $? -eq 124 ]; then
     echo "ERROR: The test case terminated by hitting the timeout." >> $BUGDIR/P-ART-3.log
 fi
 sed -i "46 c\#ifdef BUGFIX" ../example.cpp
-sed -i '3d' run.sh
-sed -i '4d' ../CMakeLists.txt
-cd ../../
 
 ############################### Bugs in P-BwTree
 cd P-BwTree
