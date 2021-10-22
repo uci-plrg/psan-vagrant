@@ -5,12 +5,12 @@ set -ex
 ## Setup
 RESULTDIR=~/results
 PERFDIR=$RESULTDIR/performance
-OUTFILE=$PERFDIR/random-performance.csv
+OUTFILE=$PERFDIR/psan-performance.csv
 LOG=$PERFDIR/log.log
 mkdir -p $RESULTDIR
 rm -rf $PERFDIR
 mkdir -p $PERFDIR
-echo 'Benchmark, Baseline(s), PMRace(s), # Prefix Bugs, # Naive Bugs' > $OUTFILE
+echo 'Benchmark, Baseline(s), PMSan(s)' > $OUTFILE
 GCCCOMPILER=/home/vagrant/pmcheck-vmem/Test/gcc
 GXXCOMPILER=/home/vagrant/pmcheck-vmem/Test/g++
 
@@ -35,19 +35,17 @@ run_cceh() {
 	done
 	end=`date +%s.%N`
 	JAARU=$( echo "$end/100 - $start/100" | bc -l )
-	sed -i '3s/export PMCheck.*/export PMCheck="-x1 -y"/' run.sh
-	echo "Running $BENCHMARKNAME on PMRace ..."
+	sed -i '3s/export PMCheck.*/export PMCheck="-x1 -o1"/' run.sh
+	echo "Running $BENCHMARKNAME on PSan ..."
 	./run.sh ./example 30 4 &> $LOG
 	start=`date +%s.%N`
 	for i in {1..100}; do
-		sed -i "3s/export PMCheck.*/export PMCheck=\"-x1 -y -a${i}\"/" run.sh
+		sed -i "3s/export PMCheck.*/export PMCheck=\"-x1 -o1 -a${i}\"/" run.sh
 		./run.sh ./example 30 4 &> /dev/null
 	done
 	end=`date +%s.%N`
-	PMRACE=$( echo "$end/100 - $start/100" | bc -l )
-	PREFIX=$(grep "Number of distinct prefix-execution bugs" $LOG | grep -o -E '[0-9]+')
-	NAIVE=$(grep "Number of distinct full-execution bugs" $LOG | grep -o -E '[0-9]+')
-	echo "$BENCHMARKNAME, $JAARU, $PMRACE, $PREFIX, $NAIVE" >> $OUTFILE
+	PSAN=$( echo "$end/100 - $start/100" | bc -l )
+	echo "$BENCHMARKNAME, $JAARU, $PSAN" >> $OUTFILE
 	# Cleaning up
 	sed -i '3d' run.sh
 	sed -i '3s/CFLAGS.*/CFLAGS := -std=c++17 -I. -lpthread -O0 -g -DCLFLUSH_OPT=1/' Makefile
@@ -72,19 +70,17 @@ run_fast() {
         done
         end=`date +%s.%N`
         JAARU=$( echo "$end/100 - $start/100" | bc -l )
-        sed -i '3s/export PMCheck.*/export PMCheck="-x1 -y"/' run.sh
-        echo "Running $BENCHMARKNAME on PMRace ..."
+        sed -i '3s/export PMCheck.*/export PMCheck="-x1 -o1"/' run.sh
+        echo "Running $BENCHMARKNAME on PSan ..."
         ./run.sh ./example 30 4 &> $LOG
         start=`date +%s.%N`
         for i in {1..100}; do
-		sed -i "3s/export PMCheck.*/export PMCheck=\"-x1 -y -a${i}\"/" run.sh
+		sed -i "3s/export PMCheck.*/export PMCheck=\"-x1 -o1 -a${i}\"/" run.sh
                 ./run.sh ./example 30 3 &> /dev/null
         done
         end=`date +%s.%N`
-        PMRACE=$( echo "$end/100 - $start/100" | bc -l )
-        PREFIX=$(grep "Number of distinct prefix-execution bugs" $LOG | grep -o -E '[0-9]+')
-        NAIVE=$(grep "Number of distinct full-execution bugs" $LOG | grep -o -E '[0-9]+')
-        echo "$BENCHMARKNAME, $JAARU, $PMRACE, $PREFIX, $NAIVE" >> $OUTFILE
+        PSAN=$( echo "$end/100 - $start/100" | bc -l )
+        echo "$BENCHMARKNAME, $JAARU, $PSAN" >> $OUTFILE
         # Cleaning up
 	sed -i '3d' run.sh
 	sed -i '7s/CFLAGS.*/CFLAGS=-O0 -std=c++11 -g -DCLFLUSH_OPT=1/' Makefile
@@ -111,19 +107,17 @@ run_p_benchmarks() {
         done
         end=`date +%s.%N`
         JAARU=$( echo "$end/100 - $start/100" | bc -l )
-        sed -i '3s/export PMCheck.*/export PMCheck="-x1 -y"/' run.sh
-        echo "Running $BENCHMARKNAME on PMRace ..."
+        sed -i '3s/export PMCheck.*/export PMCheck="-x1 -o1"/' run.sh
+        echo "Running $BENCHMARKNAME on PSan ..."
         ./run.sh ./example $2 $3 &> $LOG
         start=`date +%s.%N`
         for i in {1..100}; do
-		sed -i "3s/export PMCheck.*/export PMCheck=\"-x1 -y -a${i}\"/" run.sh
+		sed -i "3s/export PMCheck.*/export PMCheck=\"-x1 -o1 -a${i}\"/" run.sh
                 ./run.sh ./example $2 $3 &> /dev/null
         done
         end=`date +%s.%N`
-        PMRACE=$( echo "$end/100 - $start/100" | bc -l )
-        PREFIX=$(grep "Number of distinct prefix-execution bugs" $LOG | grep -o -E '[0-9]+')
-        NAIVE=$(grep "Number of distinct full-execution bugs" $LOG | grep -o -E '[0-9]+')
-        echo "$BENCHMARKNAME, $JAARU, $PMRACE, $PREFIX, $NAIVE" >> $OUTFILE
+        PSAN=$( echo "$end/100 - $start/100" | bc -l )
+        echo "$BENCHMARKNAME, $JAARU, $PSAN" >> $OUTFILE
         # Cleaning up
         cd ..
 	rm -rf build
@@ -151,19 +145,17 @@ run_pmdk_benchmark() {
         done
         end=`date +%s.%N`
         JAARU=$( echo "$end/100 - $start/100" | bc -l )
-	sed -i '5s/export PMCheck.*/export PMCheck="-d$3 -y -x1 -r1000"/' run.sh
-        echo "Running $BENCHMARKNAME on PMRace ..."
+	sed -i '5s/export PMCheck.*/export PMCheck="-d$3 -o1 -x1 -r1000"/' run.sh
+        echo "Running $BENCHMARKNAME on PSan ..."
         ./run.sh ./data_store $BENCHMARKNAME ./tmp.log 2 &> $LOG
         start=`date +%s.%N`
         for i in {1..100}; do
-		sed -i "5s/export PMCheck.*/export PMCheck=\"-d\$3 -y -x1 -r1000 -a${i}\"/" run.sh
+		sed -i "5s/export PMCheck.*/export PMCheck=\"-d\$3 -o1 -x1 -r1000 -a${i}\"/" run.sh
                 ./run.sh ./data_store $BENCHMARKNAME ./tmp.log 2 &> /dev/null
         done
         end=`date +%s.%N`
-        PMRACE=$( echo "$end/100 - $start/100" | bc -l )
-        PREFIX=$(grep "Number of distinct prefix-execution bugs" $LOG | grep -o -E '[0-9]+')
-        NAIVE=$(grep "Number of distinct full-execution bugs" $LOG | grep -o -E '[0-9]+')
-        echo "$BENCHMARKNAME, $JAARU, $PMRACE, $PREFIX, $NAIVE" >> $OUTFILE
+        PSAN=$( echo "$end/100 - $start/100" | bc -l )
+        echo "$BENCHMARKNAME, $JAARU, $PSAN" >> $OUTFILE
 	mv $LOG "$LOG-$BENCHMARKNAME"
 }
 
@@ -174,7 +166,7 @@ run_pmdk() {
 	echo 'export NDCTL_ENABLE=n' >> run.sh
 	echo 'export LD_LIBRARY_PATH=~/pmcheck/bin/:~/pmdk/src/debug' >> run.sh
 	echo 'export DYLD_LIBRARY_PATH=~/pmcheck/bin/' >> run.sh
-	echo 'export PMCheck="-d$3 -y -x1 -r1000"' >> run.sh
+	echo 'export PMCheck="-d$3 -o1 -x1 -r1000"' >> run.sh
 	echo '$@' >> run.sh
 	chmod +x run.sh
 	run_pmdk_benchmark btree
@@ -206,9 +198,9 @@ run_redis() {
         done
 	end=`date +%s.%N`
 	JAARU=$( echo "$end/100 - $start/100" | bc -l )
-	sed -i '6s/export PMCheck.*/export PMCheck="-d.\/redis.pm -x1 -p1 -y -e -r2000"/' run.sh
-        sed -i '6s/export PMCheck.*/export PMCheck="-d.\/redis.pm -x1 -p1 -y -e -r2000"/' $BENCHMARKDIR/run2.sh
-	echo "Running $BENCHMARKNAME on PMRace ..."
+	sed -i '6s/export PMCheck.*/export PMCheck="-d.\/redis.pm -x1 -p1 -o1 -e -r2000"/' run.sh
+        sed -i '6s/export PMCheck.*/export PMCheck="-d.\/redis.pm -x1 -p1 -o1 -e -r2000"/' $BENCHMARKDIR/run2.sh
+	echo "Running $BENCHMARKNAME on PSan ..."
 	./run.sh ./src/redis-server ./redis.conf &> $LOG &
 	sleep 2
 	~/testcase/redistestcase.sh 1 | $BENCHMARKDIR/run2.sh $BENCHMARKDIR/src/redis-cli &> /dev/null
@@ -218,7 +210,7 @@ run_redis() {
         rm -f dump.rdb
 	start=`date +%s.%N`
         for i in {1..100}; do
-		sed -i "6s/export PMCheck.*/export PMCheck=\"-d.\/redis.pm -x1 -p1 -y -e -r2000 -a${i}\"/" run.sh
+		sed -i "6s/export PMCheck.*/export PMCheck=\"-d.\/redis.pm -x1 -p1 -o1 -e -r2000 -a${i}\"/" run.sh
 		./run.sh ./src/redis-server ./redis.conf &> /dev/null &
         	sleep 2
 		~/testcase/redistestcase.sh 1 | $BENCHMARKDIR/run2.sh $BENCHMARKDIR/src/redis-cli &> /dev/null
@@ -228,10 +220,8 @@ run_redis() {
         	rm -f dump.rdb
 	done
 	end=`date +%s.%N`
-	PMRACE=$( echo "$end/100 - $start/100" | bc -l )
-        PREFIX=$(grep "Number of distinct prefix-execution bugs" $LOG | grep -o -E '[0-9]+')
-        NAIVE=$(grep "Number of distinct full-execution bugs" $LOG | grep -o -E '[0-9]+')
-        echo "$BENCHMARKNAME, $JAARU, $PMRACE, $PREFIX, $NAIVE" >> $OUTFILE
+	PSAN=$( echo "$end/100 - $start/100" | bc -l )
+        echo "$BENCHMARKNAME, $JAARU, $PSAN" >> $OUTFILE
 	mv $LOG "$LOG-$BENCHMARKNAME"
 }
 
@@ -255,29 +245,29 @@ run_memcached() {
 	done
 	end=`date +%s.%N`
         JAARU=$( echo "$end/100 - $start/100" | bc -l )
-	sed -i '6s/export PMCheck.*/export PMCheck="-dfoo -x1 -p1 -y -e -r2000"/' run.sh
+	sed -i '6s/export PMCheck.*/export PMCheck="-dfoo -x1 -p1 -o1 -e -r2000"/' run.sh
 	# Change pmcheck
-	PMRACEDIR=~/pmcheck
-	cd $PMRACEDIR
+	PSANDIR=~/pmcheck
+	cd $PSANDIR
 	sed -i '331i    complete=true;' Model/model.cc
 	make
 	cd $BENCHMARKDIR
-	echo "Running $BENCHMARKNAME on PMRace ..."
+	echo "Running $BENCHMARKNAME on PSan ..."
 	./run.sh ./memcached &> $LOG &
         sleep 1
         ~/testcase/memcachedtestcase.sh 1 | telnet localhost 11211 &> /dev/null
         sleep 1
         ~/testcase/memcachedtestcase.sh 0 | telnet localhost 11212 &> /dev/null
 	rm -f foo
-	## Reverting changes in PMRace
-	cd $PMRACEDIR
+	## Reverting changes in PSan
+	cd $PSANDIR
 	git checkout -- Model/model.cc
 	make
 	cd $BENCHMARKDIR
 
 	start=`date +%s.%N`
         for i in {1..100}; do
-		sed -i "6s/export PMCheck.*/export PMCheck=\"-dfoo -x1 -p1 -y -e -r2000 -a${i}\"/" run.sh
+		sed -i "6s/export PMCheck.*/export PMCheck=\"-dfoo -x1 -p1 -o1 -e -r2000 -a${i}\"/" run.sh
 		 ./run.sh ./memcached &> /dev/null &
         	sleep 1
         	~/testcase/memcachedtestcase.sh 1 | telnet localhost 11211 &> /dev/null
@@ -285,17 +275,15 @@ run_memcached() {
         	~/testcase/memcachedtestcase.sh 0 | telnet localhost 11212 &> /dev/null
 	done
 	end=`date +%s.%N`
-        PMRACE=$( echo "$end/100 - $start/100" | bc -l )
-        PREFIX=$(grep "Number of distinct prefix-execution bugs" $LOG | grep -o -E '[0-9]+')
-        NAIVE=$(grep "Number of distinct full-execution bugs" $LOG | grep -o -E '[0-9]+')
-        echo "$BENCHMARKNAME, $JAARU, $PMRACE, $PREFIX, $NAIVE" >> $OUTFILE
+        PSAN=$( echo "$end/100 - $start/100" | bc -l )
+        echo "$BENCHMARKNAME, $JAARU, $PSAN" >> $OUTFILE
 	mv $LOG "$LOG-$BENCHMARKNAME"
 }
 
 run_recipe
-run_pmdk
-run_redis
-run_memcached
+#run_pmdk
+#run_redis
+#run_memcached
 
 ## Cleanup
 cat $OUTFILE | sed 's/,/ ,/g' | column -t -s, &> $PERFDIR/performance.out
