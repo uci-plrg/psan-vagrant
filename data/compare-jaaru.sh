@@ -254,8 +254,9 @@ function p_clht_bugs {
 
 function p_masstree_bug_1 {
 	sed -i '1374d' ../masstree.h
+	sed -i '1374d' ../masstree.h
         sed -i '18d' ../masstree.h
-	make -j
+	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	timeout 10 ./run.sh ./example 20 10 &> $BUGDIR/P-Masstree-1.log
 	sed -i '3d' ./run.sh
