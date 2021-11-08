@@ -249,7 +249,7 @@ run_memcached() {
 	# Change pmcheck
 	PSANDIR=~/pmcheck
 	cd $PSANDIR
-	sed -i '331i    complete=true;' Model/model.cc
+	sed -i '355i    complete=true;' Model/model.cc
 	make
 	cd $BENCHMARKDIR
 	echo "Running $BENCHMARKNAME on PSan ..."
@@ -281,7 +281,7 @@ run_memcached() {
 }
 
 run_recipe
-#run_pmdk
+run_pmdk
 #run_redis
 #run_memcached
 

@@ -9,7 +9,7 @@ PMRACEDIR=~/pmcheck
 
 ## Modifying PMRace to print Warning due to ungracefull shutdown by memcached
 cd $PMRACEDIR
-sed -i '331i	complete=true;' Model/model.cc
+sed -i '355i	complete=true;' Model/model.cc
 make
 cd
 
