@@ -6,18 +6,22 @@ function setup_result_dir {
 	RESULTDIR=~/results
 	mkdir -p $RESULTDIR
 	BUGDIR=$RESULTDIR/recipe-jaaru-bugs
+	LOGDIR=$BUGDIR/logs
 	rm -rf $BUGDIR
 	mkdir $BUGDIR
+	mkdir $LOGDIR
 }
 
 function cceh_bug_1 {
 	sed -i '178d' src/CCEH_LSB.cpp
 	make BUGFLAG=-DVERIFYFIX=0 &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
-	timeout 30 ./run.sh ./example 2 1 >> $BUGDIR/CCEH-bug-1.log
+	BUGNAME=CCEH-bug-1.log
+	timeout 30 ./run.sh ./example 2 1 >> $LOGDIR/$BUGNAME
 	if [ $? -eq 124 ]; then
-	    echo "ERROR: The test case terminated by hitting the timeout." >> $BUGDIR/CCEH-bug-1.log
+	    echo "ERROR: The test case terminated by hitting the timeout." >> $LOGDIR/$BUGNAME
 	fi
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
 	git checkout -- src/CCEH_LSB.cpp
 	git checkout -- run.sh
@@ -27,7 +31,9 @@ function cceh_bug_2 {
 	sed -i '179d' src/CCEH_LSB.cpp
 	make BUGFLAG=-DVERIFYFIX=0 &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
-	timeout 30 ./run.sh ./example 2 1 >> $BUGDIR/CCEH-bug-2.log
+	BUGNAME=CCEH-bug-2.log
+	timeout 30 ./run.sh ./example 2 1 >> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
         git checkout -- src/CCEH_LSB.cpp
         git checkout -- run.sh
@@ -37,7 +43,9 @@ function cceh_bug_3 {
 	sed -i '184d' src/CCEH_LSB.cpp
 	make BUGFLAG=-DVERIFYFIX=0 &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
-	timeout 30 ./run.sh ./example 2 1 >> $BUGDIR/CCEH-bug-3.log
+	BUGNAME=CCEH-bug-3.log
+	timeout 30 ./run.sh ./example 2 1 >> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
         git checkout -- src/CCEH_LSB.cpp
         git checkout -- run.sh
@@ -62,7 +70,9 @@ function fast_fair_bug_1 {
 	sed -i '1859d' btree.h
 	make BUGFLAG=-DVERIFYFIX=0 &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
-	timeout 10 ./run.sh ./example 10 2 &>> $BUGDIR/FAST_FAIR-bug-1.log
+	BUGNAME=FAST_FAIR-bug-1.log
+	timeout 10 ./run.sh ./example 10 2 &>> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
 	git checkout -- btree.h
         git checkout -- run.sh
@@ -72,7 +82,9 @@ function fast_fair_bug_2 {
 	sed -i '1863d' btree.h
 	make BUGFLAG=-DVERIFYFIX=0 &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
-	timeout 10 ./run.sh ./example 2 2 >> $BUGDIR/FAST_FAIR-bug-2.log
+	BUGNAME=FAST_FAIR-bug-2.log
+	timeout 10 ./run.sh ./example 2 2 >> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
         git checkout -- btree.h
         git checkout -- run.sh
@@ -96,7 +108,9 @@ function p_art_bug_1 {
 	sed -i '9d' ../Epoche.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
-	timeout 10 ./run.sh ./example 9 5 &> $BUGDIR/P-ART-1.log
+	BUGNAME=P-ART-1.log
+	timeout 10 ./run.sh ./example 9 5 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
 	sed -i '3d' run.sh
 	git checkout -- ../Epoche.h
@@ -107,7 +121,9 @@ function p_art_bug_2 {
 	sed -i '9d' ../Epoche.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
-	timeout 10 ./run.sh ./example 2 2 &> $BUGDIR/P-ART-2.log
+	BUGNAME=P-ART-2.log
+	timeout 10 ./run.sh ./example 2 2 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
         sed -i '3d' run.sh
 	git checkout -- ../Epoche.h
@@ -119,7 +135,9 @@ function p_art_bug_3 {
 	sed -i '9d' ../Epoche.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
-	timeout 30 ./run.sh ./example 2 2 &> $BUGDIR/P-ART-3.log
+	BUGNAME=P-ART-3.log
+	timeout 30 ./run.sh ./example 2 2 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
         sed -i '3d' run.sh	
 	git checkout -- ../Epoche.h
@@ -145,7 +163,9 @@ function p_bwtree_bug_1 {
 	sed -i '69d' ../src/bwtree.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
-	timeout 10 ./run.sh ./example 2 2 &> $BUGDIR/P-BwTree-Bug-1.log
+	BUGNAME=P-BwTree-Bug-1.log
+	timeout 10 ./run.sh ./example 2 2 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
         sed -i '3d' run.sh
         git checkout -- ../src/bwtree.h
@@ -157,7 +177,9 @@ function p_bwtree_bug_2 {
 	sed -i '69d' ../src/bwtree.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
-	timeout 30 ./run.sh ./example 8 2 &> $BUGDIR/P-BwTree-Bug-2.log
+	BUGNAME=P-BwTree-Bug-2.log
+	timeout 30 ./run.sh ./example 8 2 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	sed -i '3d' run.sh
         git checkout -- ../src/bwtree.h
 }
@@ -167,7 +189,9 @@ function p_bwtree_bug_3 {
 	sed -i '69d' ../src/bwtree.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
-	timeout 10 ./run.sh ./example 10 2 &> $BUGDIR/P-BwTree-Bug-3.log
+	BUGNAME=P-BwTree-Bug-3.log
+	timeout 10 ./run.sh ./example 10 2 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	sed -i '3d' run.sh
         git checkout -- ../src/bwtree.h
 }
@@ -177,7 +201,9 @@ function p_bwtree_bug_4 {
 	sed -i '69d' ../src/bwtree.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
-	timeout 10 ./run.sh ./example 2 2 &> $BUGDIR/P-BwTree-Bug-4.log
+	BUGNAME=P-BwTree-Bug-4.log
+	timeout 10 ./run.sh ./example 2 2 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	sed -i '3d' run.sh
         git checkout -- ../src/bwtree.h
 }
@@ -187,7 +213,9 @@ function p_bwtree_bug_5 {
 	sed -i '69d' ../src/bwtree.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
-	timeout 10 ./run.sh ./example 2 2 &> $BUGDIR/P-BwTree-Bug-5.log
+	BUGNAME=P-BwTree-Bug-5.log
+	timeout 10 ./run.sh ./example 2 2 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	sed -i '3d' ./run.sh
 	git checkout -- ../src/bwtree.h
 }
@@ -213,7 +241,9 @@ function p_clht_bug_1 {
 	sed -i '31d' ../src/clht_lf_res.c
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-o2 -p1"' run.sh
-	timeout 30 ./run.sh ./example 2 2 &> $BUGDIR/P-CLHT-Bug-1.log
+	BUGNAME=P-CLHT-Bug-1.log
+	timeout 30 ./run.sh ./example 2 2 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	sed -i '3d' ./run.sh
 	git checkout -- ../src/clht_lf_res.c
 }
@@ -223,7 +253,9 @@ function p_clht_bug_2 {
         sed -i '31d' ../src/clht_lf_res.c
         make -j &> /dev/null
         sed -i '3iexport PMCheck="-o2 -p1"' run.sh
-	timeout 30 ./run.sh ./example 2 2 &> $BUGDIR/P-CLHT-Bug-2.log
+	BUGNAME=P-CLHT-Bug-2.log
+	timeout 30 ./run.sh ./example 2 2 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
         sed -i '3d' ./run.sh
         git checkout -- ../src/clht_lf_res.c
 }
@@ -233,7 +265,9 @@ function p_clht_bug_3 {
         sed -i '31d' ../src/clht_lf_res.c
         make -j &> /dev/null
         sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
-	timeout 30 ./run.sh ./example 2 2 &> $BUGDIR/P-CLHT-Bug-3.log
+	BUGNAME=P-CLHT-Bug-3.log
+	timeout 30 ./run.sh ./example 2 2 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
         sed -i '3d' ./run.sh
         git checkout -- ../src/clht_lf_res.c
 }
@@ -258,7 +292,9 @@ function p_masstree_bug_1 {
         sed -i '18d' ../masstree.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
-	timeout 10 ./run.sh ./example 20 10 &> $BUGDIR/P-Masstree-1.log
+	BUGNAME=P-Masstree-Bug-1.log
+	timeout 10 ./run.sh ./example 20 10 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	sed -i '3d' ./run.sh
 	git checkout -- ../masstree.h
 }

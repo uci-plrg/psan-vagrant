@@ -32,7 +32,7 @@ function cceh_bug_2 {
 	# Key variable bug
 	sed -i '33d' src/CCEH_LSB.cpp
 	make &> /dev/null
-	sed -i "3iexport PMCheck=\"-x10000 ${STRATEGY} -p1\"" run.sh
+	sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=CCEH-bug-2.log
 	./run.sh ./example 30 4 >> $LOGDIR/$BUGNAME
 	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
@@ -97,9 +97,9 @@ function cceh_bugs {
 	make clean
 	
 	cceh_bug_1
-	#cceh_bug_2
+	cceh_bug_2
 	cceh_bug_3
-	#cceh_bug_4
+	cceh_bug_4
 	cceh_bug_5
 	#cceh_run
 
@@ -123,7 +123,7 @@ function fast_fair_bug_1 {
 
 function fast_fair_bug_2 {
 	# last_index bug
-	sed -i '653d' btree.h
+	sed -i '656d' btree.h
 	make &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=FAST_FAIR-bug-2.log
@@ -136,8 +136,8 @@ function fast_fair_bug_2 {
 
 function fast_fair_bug_3 {
         # header class bug
-        sed -i '654d' btree.h
-        sed -i '652d' btree.h
+        sed -i '657d' btree.h
+        sed -i '655d' btree.h
 	sed -i '587d' btree.h
 	sed -i '585d' btree.h
 	sed -i '24d' btree.h
@@ -181,7 +181,7 @@ function fast_fair_bugs {
 	fast_fair_bug_2
 	fast_fair_bug_3
 	fast_fair_bug_4
-	#fast_fair_run
+#	fast_fair_run
 
 	git checkout -- Makefile
 	sed -i 's/CXX=.*/CXX=~\/pmcheck-vmem\/Test\/g++/g' Makefile
@@ -329,25 +329,27 @@ function p_art_bugs {
 }
 
 function p_bwtree_bug_1 {
-	sed -i '69d' ../src/bwtree.h
-	make -j &> /dev/null
-        sed -i "3iexport PMCheck=\"-x10000 ${STRATEGY} -p1\"" run.sh
-	BUGNAME=P-BwTree-Bug-1.log
-	./run.sh ./example 7 2 &> $LOGDIR/$BUGNAME
-	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
-	make clean &> /dev/null
+        sed -i '2091d' ../src/bwtree.h
+        make -j &> /dev/null
+        sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
+        BUGNAME=P-BwTree-Bug-1.log
+        timeout 300 ./run.sh ./example 45 4 &> $LOGDIR/$BUGNAME
+        python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
+        make clean &> /dev/null
         sed -i '3d' run.sh
         git checkout -- ../src/bwtree.h
 }
 
 function p_bwtree_bug_2 {
-        sed -i '2091d' ../src/bwtree.h
-        make -j &> /dev/null
-        sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-	BUGNAME=P-BwTree-Bug-2.log
-        timeout 300 ./run.sh ./example 45 4 &> $LOGDIR/$BUGNAME
+        sed -i '2092d' ../src/bwtree.h
+        sed -i '2090d' ../src/bwtree.h
+	sed -i '69d' ../src/bwtree.h
+	make -j &> /dev/null
+        sed -i "3iexport PMCheck=\"-x10000 ${STRATEGY} -p1\"" run.sh
+	BUGNAME=P-BwTree-Mem-Bugs.log
+	./run.sh ./example 7 2 &> $LOGDIR/$BUGNAME
 	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
-        make clean &> /dev/null
+	make clean &> /dev/null
         sed -i '3d' run.sh
         git checkout -- ../src/bwtree.h
 }
