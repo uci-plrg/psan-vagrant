@@ -16,8 +16,7 @@ git clone https://github.com/uci-plrg/nvm-benchmarks.git
 cd nvm-benchmarks
 git checkout psan
 rm -rf redis
-git clone https://github.com/uci-plrg/memcached-pmem
-mv memcached-pmem memcached
+git clone https://github.com/uci-plrg/memcached
 cd memcached
 git checkout pmrace
 cd ..

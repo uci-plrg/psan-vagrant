@@ -24,7 +24,7 @@ mkdir $LOGDIR
 rm -f foo
 
 # Run Server
-sed -i '6s/export PMCheck.*/export PMCheck="-dfoo -x2 -p1 -y -e -r2000"/' run.sh
+sed -i '6s/export PMCheck.*/export PMCheck="-dfoo -x2 -p1 -o2 -e -r2000"/' run.sh
 BENCHMARKNAME=memcached-pmem
 echo "Running $BENCHMARKNAME ..."
 TREELOG=$LOGDIR/$BENCHMARKNAME-org.log

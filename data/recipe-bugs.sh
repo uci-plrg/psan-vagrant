@@ -8,8 +8,10 @@ function setup_result_dir {
 	RESULTDIR=~/results
 	mkdir -p $RESULTDIR
 	BUGDIR=$RESULTDIR/recipe-bugs
+	LOGDIR=$BUGDIR/logs
 	rm -rf $BUGDIR
 	mkdir $BUGDIR
+	mkdir $LOGDIR
 }
 
 function cceh_bug_1 {
@@ -17,7 +19,9 @@ function cceh_bug_1 {
 	sed -i '23d' src/CCEH_LSB.cpp
 	make &> /dev/null
 	sed -i "3iexport PMCheck=\"-x100 ${STRATEGY} -p1\"" run.sh
-	./run.sh ./example 30 4 >> $BUGDIR/CCEH-bug-1.log
+	BUGNAME=CCEH-bug-1.log
+	./run.sh ./example 30 4 >> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
 	git checkout -- src/CCEH_LSB.cpp
 	git checkout -- run.sh
@@ -29,7 +33,9 @@ function cceh_bug_2 {
 	sed -i '33d' src/CCEH_LSB.cpp
 	make &> /dev/null
 	sed -i "3iexport PMCheck=\"-x10000 ${STRATEGY} -p1\"" run.sh
-	./run.sh ./example 30 4 >> $BUGDIR/CCEH-bug-2.log
+	BUGNAME=CCEH-bug-2.log
+	./run.sh ./example 30 4 >> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
 	git checkout -- src/CCEH_LSB.cpp
 	git checkout -- run.sh
@@ -40,21 +46,12 @@ function cceh_bug_3 {
 	sed -i '39d' src/CCEH_LSB.cpp
 	make &> /dev/null
 	sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-	./run.sh ./example 30 4 >> $BUGDIR/CCEH-bug-3.log
+	BUGNAME=CCEH-bug-3.log
+	./run.sh ./example 30 4 >> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
 	git checkout -- src/CCEH_LSB.cpp
 	git checkout -- run.sh
-}
-
-function cceh_bug_3 {
-        # key variable bug
-        sed -i '39d' src/CCEH_LSB.cpp
-        make &> /dev/null
-        sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-        ./run.sh ./example 30 4 >> $BUGDIR/CCEH-bug-3.log
-        make clean &> /dev/null
-        git checkout -- src/CCEH_LSB.cpp
-        git checkout -- run.sh
 }
 
 function cceh_bug_4 {
@@ -63,7 +60,9 @@ function cceh_bug_4 {
         sed -i '49d' src/CCEH_LSB.cpp
         make &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-        ./run.sh ./example 30 4 >> $BUGDIR/CCEH-bug-4.log
+	BUGNAME=CCEH-bug-4.log
+        ./run.sh ./example 30 4 >> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
         make clean &> /dev/null
         git checkout -- src/CCEH_LSB.cpp
         git checkout -- run.sh
@@ -74,7 +73,9 @@ function cceh_bug_5 {
         sed -i '55d' src/CCEH_LSB.cpp
         make &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-        ./run.sh ./example 30 4 >> $BUGDIR/CCEH-bug-5.log
+	BUGNAME=CCEH-bug-5.log
+        ./run.sh ./example 30 4 >> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
         make clean &> /dev/null
         git checkout -- src/CCEH_LSB.cpp
         git checkout -- run.sh
@@ -84,7 +85,9 @@ function cceh_run {
         # key variable bug
         make &> /dev/null
         sed -i "3iexport PMCheck=\"-x10000 ${STRATEGY} -p1\"" run.sh
-        ./run.sh ./example 125 6 >> $BUGDIR/CCEH-Run.log
+	BUGNAME=CCEH-Run.log
+        ./run.sh ./example 125 6 >> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
         make clean &> /dev/null
         git checkout -- run.sh
 }
@@ -98,6 +101,7 @@ function cceh_bugs {
 	cceh_bug_3
 	#cceh_bug_4
 	cceh_bug_5
+	#cceh_run
 
 	git checkout -- Makefile
 	sed -i 's/CXX := \/.*/CXX := ~\/pmcheck-vmem\/Test\/g++/g' Makefile
@@ -109,7 +113,9 @@ function fast_fair_bug_1 {
 	sed -i '586d' btree.h
 	make &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-	./run.sh ./example 30 4 &>> $BUGDIR/FAST_FAIR-bug-1.log
+	BUGNAME=FAST_FAIR-bug-1.log
+	./run.sh ./example 30 4 &>> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
 	git checkout -- btree.h
         git checkout -- run.sh
@@ -120,7 +126,9 @@ function fast_fair_bug_2 {
 	sed -i '653d' btree.h
 	make &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-	./run.sh ./example 30 4 &>> $BUGDIR/FAST_FAIR-bug-2.log
+	BUGNAME=FAST_FAIR-bug-2.log
+	./run.sh ./example 30 4 &>> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
 	git checkout -- btree.h
         git checkout -- run.sh
@@ -135,7 +143,9 @@ function fast_fair_bug_3 {
 	sed -i '24d' btree.h
         make
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-        ./run.sh ./example 30 4 &>> $BUGDIR/FAST_FAIR-bug-3.log
+	BUGNAME=FAST_FAIR-bug-3.log
+        ./run.sh ./example 30 4 &>> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
         make clean &> /dev/null
         git checkout -- btree.h
         git checkout -- run.sh
@@ -146,7 +156,9 @@ function fast_fair_bug_4 {
         sed -i '605d' btree.h
         make &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-        ./run.sh ./example 126 6 &>> $BUGDIR/FAST_FAIR-bug-4.log
+	BUGNAME=FAST_FAIR-bug-4.log
+        ./run.sh ./example 126 6 &>> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
         make clean &> /dev/null
         git checkout -- btree.h
         git checkout -- run.sh
@@ -155,7 +167,9 @@ function fast_fair_bug_4 {
 function fast_fair_run {
         make
         sed -i "3iexport PMCheck=\"-x10000 ${STRATEGY} -p1\"" run.sh
-        ./run.sh ./example 125 6 &>> $BUGDIR/FAST_FAIR-Run.log
+	BUGNAME=FAST_FAIR-Run.log
+        ./run.sh ./example 125 6 &>> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
         make clean &> /dev/null
         git checkout -- run.sh
 }
@@ -167,7 +181,7 @@ function fast_fair_bugs {
 	fast_fair_bug_2
 	fast_fair_bug_3
 	fast_fair_bug_4
-	fast_fair_run
+	#fast_fair_run
 
 	git checkout -- Makefile
 	sed -i 's/CXX=.*/CXX=~\/pmcheck-vmem\/Test\/g++/g' Makefile
@@ -178,7 +192,9 @@ function p_art_bug_1 {
 	sed -i '99d' ../N.cpp
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-	./run.sh ./example 30 4 &> $BUGDIR/P-ART-1.log
+	BUGNAME=P-ART-1.log
+	./run.sh ./example 30 4 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
 	sed -i '3d' run.sh
 	git checkout -- ../N.cpp
@@ -188,7 +204,9 @@ function p_art_bug_2 {
 	sed -i '110d' ../N.cpp
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-	./run.sh ./example 30 4 &> $BUGDIR/P-ART-2.log
+	BUGNAME=P-ART-2.log
+	./run.sh ./example 30 4 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
 	sed -i '3d' run.sh
 	git checkout -- ../N.cpp
@@ -198,7 +216,9 @@ function p_art_bug_3 {
 	sed -i '121d' ../N.cpp
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-	./run.sh ./example 30 4 &> $BUGDIR/P-ART-3.log
+	BUGNAME=P-ART-3.log
+	./run.sh ./example 30 4 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
 	sed -i '3d' run.sh
 	git checkout -- ../N.cpp
@@ -208,7 +228,9 @@ function p_art_bug_4 {
 	sed -i '23d' ../N4.cpp
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-	./run.sh ./example 30 4 &> $BUGDIR/P-ART-4.log
+	BUGNAME=P-ART-4.log
+	./run.sh ./example 30 4 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
 	sed -i '3d' run.sh
 	git checkout -- ../N4.cpp
@@ -218,7 +240,9 @@ function p_art_bug_5 {
 	sed -i '27d' ../N4.cpp
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-	./run.sh ./example 30 4 &> $BUGDIR/P-ART-5.log
+	BUGNAME=P-ART-5.log
+	./run.sh ./example 30 4 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
 	sed -i '3d' run.sh
 	git checkout -- ../N4.cpp
@@ -228,7 +252,9 @@ function p_art_bug_6 {
 	sed -i '14d' ../N16.cpp
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-	./run.sh ./example 30 4 &> $BUGDIR/P-ART-6.log
+	BUGNAME=P-ART-6.log
+	./run.sh ./example 30 4 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
 	sed -i '3d' run.sh
 	git checkout -- ../N16.cpp
@@ -239,7 +265,9 @@ function p_art_bug_7 {
         sed -i '90d' ../Epoche.h
         make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-        ./run.sh ./example 30 4 &> $BUGDIR/P-ART-Mem-Bugs.log
+	BUGNAME=P-ART-Mem-Bugs.log
+        ./run.sh ./example 30 4 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
         make clean &> /dev/null
         sed -i '3d' run.sh
         git checkout -- ../Epoche.h
@@ -249,7 +277,9 @@ function p_art_bug_8 {
         sed -i '21d' ../N16.cpp
         make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-        ./run.sh ./example 125 6 &> $BUGDIR/P-ART-8.log
+	BUGNAME=P-ART-8.log
+        ./run.sh ./example 125 6 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
         make clean &> /dev/null
         sed -i '3d' run.sh
         git checkout -- ../N16.cpp
@@ -259,7 +289,9 @@ function p_art_bug_9 {
         sed -i '68d' ../Epoche.cpp
         make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-        ./run.sh ./example 100 6 &> $BUGDIR/P-ART-9.log
+	BUGNAME=P-ART-9.log
+        ./run.sh ./example 100 6 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
         make clean &> /dev/null
         sed -i '3d' run.sh
         git checkout -- ../Epoche.cpp
@@ -268,7 +300,9 @@ function p_art_bug_9 {
 function p_art_run {
         make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x10000 ${STRATEGY} -p1\"" run.sh
-        ./run.sh ./example 125 6 &> $BUGDIR/P-ART-Run.log
+	BUGNAME=P-ART-Run.log
+        ./run.sh ./example 125 6 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
         make clean &> /dev/null
         sed -i '3d' run.sh
 }
@@ -289,7 +323,7 @@ function p_art_bugs {
 	p_art_bug_7
 	p_art_bug_8
 	p_art_bug_9
-	p_art_run
+	#p_art_run
 
 	cd ../../
 }
@@ -298,7 +332,9 @@ function p_bwtree_bug_1 {
 	sed -i '69d' ../src/bwtree.h
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x10000 ${STRATEGY} -p1\"" run.sh
-	./run.sh ./example 7 2 &> $BUGDIR/P-BwTree-Bug-1.log
+	BUGNAME=P-BwTree-Bug-1.log
+	./run.sh ./example 7 2 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
         sed -i '3d' run.sh
         git checkout -- ../src/bwtree.h
@@ -308,7 +344,9 @@ function p_bwtree_bug_2 {
         sed -i '2091d' ../src/bwtree.h
         make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
-        timeout 300 ./run.sh ./example 45 4 &> $BUGDIR/P-BwTree-Bug-2.log
+	BUGNAME=P-BwTree-Bug-2.log
+        timeout 300 ./run.sh ./example 45 4 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
         make clean &> /dev/null
         sed -i '3d' run.sh
         git checkout -- ../src/bwtree.h
@@ -317,7 +355,9 @@ function p_bwtree_bug_2 {
 function p_bwtree_run {
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x10000 ${STRATEGY} -p1\"" run.sh
-	./run.sh ./example 125 6 &> $BUGDIR/P-BwTree-Run.log
+	BUGNAME=P-BwTree-Run.log
+	./run.sh ./example 125 6 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	make clean &> /dev/null
         sed -i '3d' run.sh
 }
@@ -332,7 +372,7 @@ function p_bwtree_bugs {
 	
 	p_bwtree_bug_1
 	p_bwtree_bug_2
-	p_bwtree_run
+	#p_bwtree_run
 	
 	cd ../../
 }
@@ -340,7 +380,9 @@ function p_bwtree_bugs {
 function p_clht_run {
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x10000 ${STRATEGY} -p1\"" run.sh
-	./run.sh ./example 125 6 &> $BUGDIR/P-CLHT-Run.log
+	BUGNAME=P-CLHT-Run.log
+	./run.sh ./example 125 6 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	sed -i '3d' ./run.sh
 }
 
@@ -351,7 +393,7 @@ function p_clht_bugs {
 	cd build
 	cmake -DCMAKE_C_COMPILER=/home/vagrant/pmcheck-vmem/Test/gcc -DCMAKE_CXX_COMPILER=/home/vagrant/pmcheck-vmem/Test/g++ -DCMAKE_C_FLAGS=-fheinous-gnu-extensions ..	
 	
-	p_clht_run
+	#p_clht_run
 	
 	cd ../../
 }
@@ -359,7 +401,9 @@ function p_clht_bugs {
 function p_masstree_run {
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x10000 ${STRATEGY} -p1\"" run.sh
-	./run.sh ./example 125 6 &> $BUGDIR/P-Masstree-Run.log
+	BUGNAME=P-Masstree-Run.log
+	./run.sh ./example 125 6 &> $LOGDIR/$BUGNAME
+	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
 	sed -i '3d' ./run.sh
 }
 
@@ -370,7 +414,7 @@ function p_masstree_bugs {
 	cd build
 	cmake CMAKE_CXX_FLAGS= -DCMAKE_C_COMPILER=/home/vagrant/pmcheck-vmem/Test/gcc -DCMAKE_CXX_COMPILER=/home/vagrant/pmcheck-vmem/Test/g++ -DCMAKE_C_FLAGS=-fheinous-gnu-extensions ..
 	
-	p_masstree_run
+	#p_masstree_run
 
 	cd ../../
 }

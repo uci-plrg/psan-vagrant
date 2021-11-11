@@ -15,7 +15,7 @@ mkdir $LOGDIR
 rm -f redis.pm
 rm -f dump.rdb
 # Run Server
-sed -i '6s/export PMCheck.*/export PMCheck="-d.\/redis.pm -x2 -p1 -y -e -r2000"/' run.sh
+sed -i '6s/export PMCheck.*/export PMCheck="-d.\/redis.pm -x2 -p1 -o2 -e -r2000"/' run.sh
 BENCHMARKNAME=redis
 echo "Running $BENCHMARKNAME ..."
 TREELOG=$LOGDIR/$BENCHMARKNAME-org.log
