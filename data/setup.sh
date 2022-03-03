@@ -138,6 +138,7 @@ cd memcached
 sed -i 's/export LD_LIBRARY_PATH=.*/export LD_LIBRARY_PATH=~\/pmcheck\/bin\/:~\/pmdk\/src\/debug\//g' run.sh
 sed -i 's/export DYLD_LIBRARY_PATH=.*/export DYLD_LIBRARY_PATH=~\/pmcheck\/bin\/:~\/pmdk\/src\/debug\//g' run.sh
 ./configure --enable-pslab CFLAGS="-O0 -g -I/home/vagrant/pmcheck/Memory"
+make clean
 make CC=~/pmcheck/Test/gcc
 cd ..
 
