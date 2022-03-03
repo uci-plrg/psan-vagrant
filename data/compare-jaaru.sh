@@ -13,7 +13,7 @@ function setup_result_dir {
 }
 
 function cceh_bug_1 {
-	sed -i '178d' src/CCEH_LSB.cpp
+	sed -i '178s/^/\/\//' src/CCEH_LSB.cpp
 	make BUGFLAG=-DVERIFYFIX=0 &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	BUGNAME=CCEH-bug-1.log
@@ -28,7 +28,7 @@ function cceh_bug_1 {
 }
 
 function cceh_bug_2 {
-	sed -i '179d' src/CCEH_LSB.cpp
+	sed -i '179s/^/\/\//' src/CCEH_LSB.cpp
 	make BUGFLAG=-DVERIFYFIX=0 &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	BUGNAME=CCEH-bug-2.log
@@ -40,7 +40,7 @@ function cceh_bug_2 {
 }
 
 function cceh_bug_3 {
-	sed -i '184d' src/CCEH_LSB.cpp
+	sed -i '184s/^/\/\//' src/CCEH_LSB.cpp
 	make BUGFLAG=-DVERIFYFIX=0 &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	BUGNAME=CCEH-bug-3.log
@@ -67,7 +67,7 @@ function cceh_bugs {
 }
 
 function fast_fair_bug_1 {
-	sed -i '1859d' btree.h
+	sed -i '1862s/^/\/\//' btree.h
 	make BUGFLAG=-DVERIFYFIX=0 &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	BUGNAME=FAST_FAIR-bug-1.log
@@ -79,7 +79,7 @@ function fast_fair_bug_1 {
 }
 
 function fast_fair_bug_2 {
-	sed -i '1863d' btree.h
+	sed -i '1866s/^/\/\//' btree.h
 	make BUGFLAG=-DVERIFYFIX=0 &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	BUGNAME=FAST_FAIR-bug-2.log
@@ -104,8 +104,8 @@ function fast_fair_bugs {
 }
 
 function p_art_bug_1 {
-	sed -i '87d' ../Epoche.h
-	sed -i '9d' ../Epoche.h
+	sed -i '87s/^/\/\//' ../Epoche.h
+	sed -i '9s/^/\/\//' ../Epoche.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	BUGNAME=P-ART-1.log
@@ -117,8 +117,8 @@ function p_art_bug_1 {
 }
 
 function p_art_bug_2 {
-	sed -i '26d' ../Tree.cpp
-	sed -i '9d' ../Epoche.h
+	sed -i '26s/^/\/\//' ../Tree.cpp
+	sed -i '9s/^/\/\//' ../Epoche.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	BUGNAME=P-ART-2.log
@@ -131,8 +131,9 @@ function p_art_bug_2 {
 }
 
 function p_art_bug_3 {
-	sed -i '43d' ../example.cpp
-	sed -i '9d' ../Epoche.h
+	# Adding recovery procedure for Tree to unlock subtree
+	sed -i '43s/^/\/\//' ../example.cpp
+	sed -i '9s/^/\/\//' ../Epoche.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	BUGNAME=P-ART-3.log
@@ -153,14 +154,15 @@ function p_art_bugs {
 	
 	p_art_bug_1
 	p_art_bug_2
-	p_art_bug_3
+	#p_art_bug_3
 
 	cd ../../
 }
 
 function p_bwtree_bug_1 {
-	sed -i '168d' ../example.cpp
-	sed -i '69d' ../src/bwtree.h
+	# Update thread local where it clears Thread Local Garbage and realocate memory at the end of thread execution
+	sed -i '168s/^/\/\//' ../example.cpp
+	sed -i '69s/^/\/\//' ../src/bwtree.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	BUGNAME=P-BwTree-Bug-1.log
@@ -173,8 +175,8 @@ function p_bwtree_bug_1 {
 }
 
 function p_bwtree_bug_2 {
-	sed -i '471d' ../src/bwtree.h
-	sed -i '69d' ../src/bwtree.h
+	sed -i '471s/^/\/\//' ../src/bwtree.h
+	sed -i '69s/^/\/\//' ../src/bwtree.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	BUGNAME=P-BwTree-Bug-2.log
@@ -185,8 +187,8 @@ function p_bwtree_bug_2 {
 }
 
 function p_bwtree_bug_3 {
-	sed -i '485d' ../src/bwtree.h
-	sed -i '69d' ../src/bwtree.h
+	sed -i '485s/^/\/\//' ../src/bwtree.h
+	sed -i '69s/^/\/\//' ../src/bwtree.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	BUGNAME=P-BwTree-Bug-3.log
@@ -197,8 +199,8 @@ function p_bwtree_bug_3 {
 }
 
 function p_bwtree_bug_4 {
-	sed -i '2018d' ../src/bwtree.h
-	sed -i '69d' ../src/bwtree.h
+	sed -i '2018s/^/\/\//' ../src/bwtree.h
+	sed -i '69s/^/\/\//' ../src/bwtree.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	BUGNAME=P-BwTree-Bug-4.log
@@ -209,8 +211,8 @@ function p_bwtree_bug_4 {
 }
 
 function p_bwtree_bug_5 {
-	sed -i '2813d' ../src/bwtree.h
-	sed -i '69d' ../src/bwtree.h
+	sed -i '2813s/^/\/\//' ../src/bwtree.h
+	sed -i '69s/^/\/\//' ../src/bwtree.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	BUGNAME=P-BwTree-Bug-5.log
@@ -227,7 +229,7 @@ function p_bwtree_bugs {
 	cd build
 	cmake CMAKE_CXX_FLAGS= -DCMAKE_C_COMPILER=/home/vagrant/pmcheck-vmem/Test/gcc -DCMAKE_CXX_COMPILER=/home/vagrant/pmcheck-vmem/Test/g++ -DCMAKE_C_FLAGS=-fheinous-gnu-extensions ..
 	
-	p_bwtree_bug_1
+	#p_bwtree_bug_1
 	p_bwtree_bug_2
 	p_bwtree_bug_3
 	p_bwtree_bug_4
@@ -237,8 +239,8 @@ function p_bwtree_bugs {
 }
 
 function p_clht_bug_1 {
-	sed -i '173d' ../src/clht_lf_res.c
-	sed -i '31d' ../src/clht_lf_res.c
+	sed -i '173s/^/\/\//' ../src/clht_lf_res.c
+	sed -i '31s/^/\/\//' ../src/clht_lf_res.c
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-o2 -p1"' run.sh
 	BUGNAME=P-CLHT-Bug-1.log
@@ -249,8 +251,8 @@ function p_clht_bug_1 {
 }
 
 function p_clht_bug_2 {
-	sed -i '225d' ../src/clht_lf_res.c
-        sed -i '31d' ../src/clht_lf_res.c
+	sed -i '225s/^/\/\//' ../src/clht_lf_res.c
+        sed -i '31s/^/\/\//' ../src/clht_lf_res.c
         make -j &> /dev/null
         sed -i '3iexport PMCheck="-o2 -p1"' run.sh
 	BUGNAME=P-CLHT-Bug-2.log
@@ -261,8 +263,8 @@ function p_clht_bug_2 {
 }
 
 function p_clht_bug_3 {
-	sed -i '226d' ../src/clht_lf_res.c
-        sed -i '31d' ../src/clht_lf_res.c
+	sed -i '226s/^/\/\//' ../src/clht_lf_res.c
+        sed -i '31s/^/\/\//' ../src/clht_lf_res.c
         make -j &> /dev/null
         sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	BUGNAME=P-CLHT-Bug-3.log
@@ -287,9 +289,9 @@ function p_clht_bugs {
 }
 
 function p_masstree_bug_1 {
-	sed -i '1374d' ../masstree.h
-	sed -i '1374d' ../masstree.h
-        sed -i '18d' ../masstree.h
+	# Bug for accessing null pointer. Just a typo in the code causing segmentation fault.
+	sed -i '1373s/#ifdef/#ifndef/' ../masstree.h
+        sed -i '18s/^/\/\//' ../masstree.h
 	make -j &> /dev/null
 	sed -i '3iexport PMCheck="-f11 -o2 -p1"' run.sh
 	BUGNAME=P-Masstree-Bug-1.log
@@ -318,7 +320,7 @@ function compare_psan_jaaru {
 	p_art_bugs
 	p_bwtree_bugs
 	p_clht_bugs
-	p_masstree_bugs
+#	p_masstree_bugs
 	
 }
 

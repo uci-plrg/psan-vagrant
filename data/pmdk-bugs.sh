@@ -3,12 +3,14 @@ set -e
 ######################################## Defining variables
 BENCHMARKDIR=~/pmdk
 RESULTDIR=~/results
-LOGDIR=$RESULTDIR/pmdk
+BUGDIR=$RESULTDIR/pmdk
+LOGDIR=$BUGDIR/logs
 STRATEGY=-o2
 ######################################### Running Jaaru to find bugs
 cd $BENCHMARKDIR
 mkdir -p $RESULTDIR
-rm -rf $LOGDIR
+rm -rf $BUGDIR
+mkdir $BUGDIR
 mkdir $LOGDIR
 cd $BENCHMARKDIR/src/examples/libpmemobj/map/
 # Creating run.sh
@@ -78,10 +80,92 @@ function hashmap_tx_bug {
 	make EXTRA_CFLAGS_RELEASE="-ggdb -fno-omit-frame-pointer -O0" CC=~/pmcheck/Test/gcc CXX=~/pmcheck/Test/g++ &> /dev/null
 }
 
-btree_bug
+function pmdk_bug_1 {
+        sed -i '426s/#ifdef/#ifndef/' src/libpmemobj/obj.c
+        make EXTRA_CFLAGS_RELEASE="-ggdb -fno-omit-frame-pointer -O0" CC=~/pmcheck/Test/gcc CXX=~/pmcheck/Test/g++ &> /dev/null
+	cd $BENCHMARKDIR/src/examples/libpmemobj/map/
+	
+	BUGNAME=PMDK-Bug-1.log
+        echo "Running $BUGNAME ..."
+        TREELOG=$LOGDIR/$BUGNAME
+        sed -i "5s/export PMCheck.*/export PMCheck=\"-d\$3 ${STRATEGY}\"/" run.sh
+        ./run.sh ./data_store btree ./tmp.log 2 &> $TREELOG
+	python ~/parse.py $TREELOG &> $BUGDIR/$BUGNAME
+	# clean up
+	cd ~/pmdk
+	git checkout -- src/libpmemobj/obj.c
+	make EXTRA_CFLAGS_RELEASE="-ggdb -fno-omit-frame-pointer -O0" CC=~/pmcheck/Test/gcc CXX=~/pmcheck/Test/g++ &> /dev/null
+}
+
+function pmdk_bug_2 {
+        sed -i '362s/#ifdef/#ifndef/' src/libpmemobj/ulog.c
+        make EXTRA_CFLAGS_RELEASE="-ggdb -fno-omit-frame-pointer -O0" CC=~/pmcheck/Test/gcc CXX=~/pmcheck/Test/g++ &> /dev/null
+        cd $BENCHMARKDIR/src/examples/libpmemobj/map/
+        
+	BUGNAME=PMDK-Bug-2.log
+	echo "Running $BUGNAME ..."
+        TREELOG=$LOGDIR/$BUGNAME
+        sed -i "5s/export PMCheck.*/export PMCheck=\"-d\$3 ${STRATEGY}\"/" run.sh
+        ./run.sh ./data_store btree ./tmp.log 2 &> $TREELOG
+        python ~/parse.py $TREELOG &> $BUGDIR/$BUGNAME
+	# clean up
+        cd ~/pmdk
+        git checkout -- src/libpmemobj/ulog.c
+        make EXTRA_CFLAGS_RELEASE="-ggdb -fno-omit-frame-pointer -O0" CC=~/pmcheck/Test/gcc CXX=~/pmcheck/Test/g++ &> /dev/null
+}
+
+function pmdk_bug_3 {
+        sed -i '559s/#ifdef/#ifndef/' src/libpmemobj/ulog.c
+        make EXTRA_CFLAGS_RELEASE="-ggdb -fno-omit-frame-pointer -O0" CC=~/pmcheck/Test/gcc CXX=~/pmcheck/Test/g++ &> /dev/null
+        cd $BENCHMARKDIR/src/examples/libpmemobj/map/
+
+        BUGNAME=PMDK-Bug-3.log
+        echo "Running $BUGNAME ..."
+        TREELOG=$LOGDIR/$BUGNAME
+        sed -i "5s/export PMCheck.*/export PMCheck=\"-d\$3 ${STRATEGY}\"/" run.sh
+        ./run.sh ./data_store btree ./tmp.log 2 &> $TREELOG
+        python ~/parse.py $TREELOG &> $BUGDIR/$BUGNAME
+        # clean up
+        cd ~/pmdk
+        git checkout -- src/libpmemobj/ulog.c
+        make EXTRA_CFLAGS_RELEASE="-ggdb -fno-omit-frame-pointer -O0" CC=~/pmcheck/Test/gcc CXX=~/pmcheck/Test/g++ &> /dev/null
+}
+
+
+function pmdk_bug_4 {
+        sed -i '587s/#ifdef/#ifndef/' src/libpmemobj/ulog.c
+        make EXTRA_CFLAGS_RELEASE="-ggdb -fno-omit-frame-pointer -O0" CC=~/pmcheck/Test/gcc CXX=~/pmcheck/Test/g++ &> /dev/null
+        cd $BENCHMARKDIR/src/examples/libpmemobj/map/
+
+        BUGNAME=PMDK-Bug-4.log
+        echo "Running $BUGNAME ..."
+        TREELOG=$LOGDIR/$BUGNAME
+        sed -i "5s/export PMCheck.*/export PMCheck=\"-d\$3 ${STRATEGY}\"/" run.sh
+        ./run.sh ./data_store btree ./tmp.log 2 &> $TREELOG
+        python ~/parse.py $TREELOG &> $BUGDIR/$BUGNAME
+        # clean up
+        cd ~/pmdk
+        git checkout -- src/libpmemobj/ulog.c
+        make EXTRA_CFLAGS_RELEASE="-ggdb -fno-omit-frame-pointer -O0" CC=~/pmcheck/Test/gcc CXX=~/pmcheck/Test/g++ &> /dev/null
+}
+
+
+function pmdk_bugs {
+	cd ~/pmdk
+	
+	pmdk_bug_1
+	pmdk_bug_2
+	pmdk_bug_3	
+	pmdk_bug_4
+}
+
+pmdk_bugs
+
+#btree_bug
 #ctree_bug
 #rbtree_bug
 #hashmap_atomic_bug
-hashmap_tx_bug
+#hashmap_tx_bug
 
+cd $BENCHMARKDIR/src/examples/libpmemobj/map/
 rm -f PMCheckOutput* tmp.log

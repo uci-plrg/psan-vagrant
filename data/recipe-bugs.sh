@@ -16,7 +16,7 @@ function setup_result_dir {
 
 function cceh_bug_1 {
 	# Sema variable bug
-	sed -i '23d' src/CCEH_LSB.cpp
+	sed -i '23s/^/\/\//' src/CCEH_LSB.cpp
 	make &> /dev/null
 	sed -i "3iexport PMCheck=\"-x100 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=CCEH-bug-1.log
@@ -28,9 +28,8 @@ function cceh_bug_1 {
 }
 
 function cceh_bug_2 {
-	# TODO: Need to recheck this bug
 	# Key variable bug
-	sed -i '33d' src/CCEH_LSB.cpp
+	sed -i '33s/^/\/\//' src/CCEH_LSB.cpp
 	make &> /dev/null
 	sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=CCEH-bug-2.log
@@ -43,7 +42,7 @@ function cceh_bug_2 {
 
 function cceh_bug_3 {
 	# key variable bug
-	sed -i '39d' src/CCEH_LSB.cpp
+	sed -i '39s/^/\/\//' src/CCEH_LSB.cpp
 	make &> /dev/null
 	sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=CCEH-bug-3.log
@@ -55,9 +54,8 @@ function cceh_bug_3 {
 }
 
 function cceh_bug_4 {
-        # TODO: Need to recheck this bug
 	# Sema variable bug
-        sed -i '49d' src/CCEH_LSB.cpp
+        sed -i '49s/^/\/\//' src/CCEH_LSB.cpp
         make &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=CCEH-bug-4.log
@@ -70,7 +68,7 @@ function cceh_bug_4 {
 
 function cceh_bug_5 {
         # key variable bug
-        sed -i '55d' src/CCEH_LSB.cpp
+        sed -i '55s/^/\/\//' src/CCEH_LSB.cpp
         make &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=CCEH-bug-5.log
@@ -97,9 +95,9 @@ function cceh_bugs {
 	make clean
 	
 	cceh_bug_1
-	cceh_bug_2
+	#cceh_bug_2
 	cceh_bug_3
-	cceh_bug_4
+	#cceh_bug_4
 	cceh_bug_5
 	#cceh_run
 
@@ -110,7 +108,7 @@ function cceh_bugs {
 
 function fast_fair_bug_1 {
 	# switch_counter bug
-	sed -i '586d' btree.h
+	sed -i '586s/^/\/\//' btree.h
 	make &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=FAST_FAIR-bug-1.log
@@ -123,7 +121,7 @@ function fast_fair_bug_1 {
 
 function fast_fair_bug_2 {
 	# last_index bug
-	sed -i '656d' btree.h
+	sed -i '656s/^/\/\//' btree.h
 	make &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=FAST_FAIR-bug-2.log
@@ -136,11 +134,8 @@ function fast_fair_bug_2 {
 
 function fast_fair_bug_3 {
         # header class bug
-        sed -i '657d' btree.h
-        sed -i '655d' btree.h
-	sed -i '587d' btree.h
-	sed -i '585d' btree.h
-	sed -i '24d' btree.h
+	sed -i '151s/#ifdef/#ifndef/' btree.h
+	sed -i '156s/#ifndef/#ifdef/' btree.h
         make
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=FAST_FAIR-bug-3.log
@@ -153,7 +148,7 @@ function fast_fair_bug_3 {
 
 function fast_fair_bug_4 {
         # ptr bug
-        sed -i '605d' btree.h
+        sed -i '605s/^/\/\//' btree.h
         make &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=FAST_FAIR-bug-4.log
@@ -189,7 +184,7 @@ function fast_fair_bugs {
 }
 
 function p_art_bug_1 {
-	sed -i '99d' ../N.cpp
+	sed -i '99s/^/\/\//' ../N.cpp
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=P-ART-1.log
@@ -201,7 +196,7 @@ function p_art_bug_1 {
 }
 
 function p_art_bug_2 {
-	sed -i '110d' ../N.cpp
+	sed -i '110s/^/\/\//' ../N.cpp
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=P-ART-2.log
@@ -213,7 +208,7 @@ function p_art_bug_2 {
 }
 
 function p_art_bug_3 {
-	sed -i '121d' ../N.cpp
+	sed -i '121s/^/\/\//' ../N.cpp
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=P-ART-3.log
@@ -225,7 +220,7 @@ function p_art_bug_3 {
 }
 
 function p_art_bug_4 {
-	sed -i '23d' ../N4.cpp
+	sed -i '23s/^/\/\//' ../N4.cpp
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=P-ART-4.log
@@ -237,7 +232,7 @@ function p_art_bug_4 {
 }
 
 function p_art_bug_5 {
-	sed -i '27d' ../N4.cpp
+	sed -i '27s/^/\/\//' ../N4.cpp
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=P-ART-5.log
@@ -249,7 +244,7 @@ function p_art_bug_5 {
 }
 
 function p_art_bug_6 {
-	sed -i '14d' ../N16.cpp
+	sed -i '14s/^/\/\//' ../N16.cpp
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=P-ART-6.log
@@ -261,12 +256,11 @@ function p_art_bug_6 {
 }
 
 function p_art_bug_7 {
-        sed -i '93d' ../Epoche.h
-        sed -i '90d' ../Epoche.h
+        sed -i '90s/#ifdef/#ifndef/' ../Epoche.h
         make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=P-ART-Mem-Bugs.log
-        ./run.sh ./example 30 4 &> $LOGDIR/$BUGNAME
+        timeout 90 ./run.sh ./example 30 4 &> $LOGDIR/$BUGNAME
 	python ~/parse.py $LOGDIR/$BUGNAME &> $BUGDIR/$BUGNAME
         make clean &> /dev/null
         sed -i '3d' run.sh
@@ -274,7 +268,7 @@ function p_art_bug_7 {
 }
 
 function p_art_bug_8 {
-        sed -i '21d' ../N16.cpp
+        sed -i '21s/^/\/\//' ../N16.cpp
         make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=P-ART-8.log
@@ -286,7 +280,7 @@ function p_art_bug_8 {
 }
 
 function p_art_bug_9 {
-        sed -i '68d' ../Epoche.cpp
+        sed -i '68s/^/\/\//' ../Epoche.cpp
         make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=P-ART-9.log
@@ -329,7 +323,7 @@ function p_art_bugs {
 }
 
 function p_bwtree_bug_1 {
-        sed -i '2091d' ../src/bwtree.h
+        sed -i '2091s/^/\/\//' ../src/bwtree.h
         make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x1000 ${STRATEGY} -p1\"" run.sh
         BUGNAME=P-BwTree-Bug-1.log
@@ -341,9 +335,8 @@ function p_bwtree_bug_1 {
 }
 
 function p_bwtree_bug_2 {
-        sed -i '2092d' ../src/bwtree.h
-        sed -i '2090d' ../src/bwtree.h
-	sed -i '69d' ../src/bwtree.h
+        sed -i '2090s/#ifdef/#ifndef/' ../src/bwtree.h
+	sed -i '69s/^/\/\//' ../src/bwtree.h
 	make -j &> /dev/null
         sed -i "3iexport PMCheck=\"-x10000 ${STRATEGY} -p1\"" run.sh
 	BUGNAME=P-BwTree-Mem-Bugs.log
@@ -427,8 +420,8 @@ function find_recipe_bugs {
 	fast_fair_bugs
 	p_art_bugs
 	p_bwtree_bugs
-	p_clht_bugs
-	p_masstree_bugs
+#	p_clht_bugs
+#	p_masstree_bugs
 	
 }
 
