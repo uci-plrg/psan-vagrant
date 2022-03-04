@@ -4,7 +4,7 @@ This artifact contains a vagrant repository that downloads and compiles the sour
 
 Our workflow has four primary parts: (1) creating a virtual machine and installing dependencies needed to reproduce our results, (2) downloading the source code of PSan and the benchmarks and building them, (3) providing the parameters corresponding to each bug to reproduce the bugs, and (4) Comparing bug-finding capabilities PSan with the Jaaru (The underlying model checker) on how automatically PSan suggests fixes found by Jaaru. After the experiment, the corresponding output files are generated for each bug.
 
-To simplify the evaluation process, we created an instance of VM that includes all the source code and corresponding binary files. This VM is fully set up and it is available on [Zenodo repository](#). 
+To simplify the evaluation process, we created an instance of VM that includes all the source code and corresponding binary files. This VM is fully set up and it is available on [Zenodo repository](https://doi.org/10.5281/zenodo.6326792). 
 
 
 ## Hardware Dependencies
@@ -41,7 +41,7 @@ Our tooling system and PSan have no special hardware dependencies and it can be 
 ```
     $ mkdir psan-artifact
     $ cd psan-artifact
-    $ wget #
+    $ wget https://zenodo.org/record/6326792/files/psan-artifact.box?download=1
     $ vagrant box add psan-artifact psan-artifact.box 
 ```
 
