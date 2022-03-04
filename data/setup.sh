@@ -145,4 +145,5 @@ cd ..
 # 9. Copying the generator scritps
 cd ~/
 cp /vagrant/data/*.sh ~/
+cp /vagrant/data/*.py ~/
 cp -r /vagrant/data/testcase ~/
