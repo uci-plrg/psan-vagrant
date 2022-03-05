@@ -4,7 +4,7 @@ This artifact contains a vagrant repository that downloads and compiles the sour
 
 Our workflow has four primary parts: (1) creating a virtual machine and installing dependencies needed to reproduce our results, (2) downloading the source code of PSan and the benchmarks and building them, (3) providing the parameters corresponding to each bug to reproduce the bugs, and (4) Comparing bug-finding capabilities PSan with the Jaaru (The underlying model checker) on how automatically PSan suggests fixes found by Jaaru. After the experiment, the corresponding output files are generated for each bug.
 
-To simplify the evaluation process, we created an instance of VM that includes all the source code and corresponding binary files. This VM is fully set up and it is available on [Zenodo repository](https://doi.org/10.5281/zenodo.6326792). 
+To simplify the evaluation process, we created an instance of VM that includes all the source code and corresponding binary files. This VM is fully set up and it is available on [Zenodo repository](https://doi.org/10.5281/zenodo.6326792). This document also provides a guideline on how to setup the VM and use it to reproduce PSan's evaluation results.
 
 
 ## Hardware Dependencies
@@ -41,9 +41,11 @@ Our tooling system and PSan have no special hardware dependencies and it can be 
 ```
     $ mkdir psan-artifact
     $ cd psan-artifact
-    $ wget https://zenodo.org/record/6326792/files/psan-artifact.box?download=1
+    $ wget https://zenodo.org/record/6326792/files/psan-artifact.box
     $ vagrant box add psan-artifact psan-artifact.box 
 ```
+
+**Note:** If you encountered an error in unpackaging the VM image, please verify that your machine has the proper version of Vagrant (>= 2.2.19). For updating your Vagrant, follow the instructions of **Note** section in **Step 2**. 
 
 Then, create a 'Vagrantfile' that contains the following configurations:
 
@@ -146,7 +148,8 @@ Evaluation and analysis for each of these bugs are listed in [PSan Bug Report](h
 ```
     vagrant@ubuntu-bionic:~$ ls ~/results/performance
     log.log-CCEH       log.log-P-ART     log.log-P-CLHT      log.log-btree  log.log-hashmap_atomic  log.log-rbtree   psan-performance.csv
-    log.log-FAST_FAIR  log.log-P-BwTree  log.log-P-Masstree  log.log-ctree  log.log-hashmap_tx      **performance.out**
+    log.log-FAST_FAIR  log.log-P-BwTree  log.log-P-Masstree  log.log-ctree  log.log-hashmap_tx      performance.out
+    vagrant@ubuntu-bionic:~$ cat ~/results/performance/performance.out
 ```
 
 ## Notes
