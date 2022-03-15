@@ -96,13 +96,13 @@ end
 
 This section provides detailed step-by-step instructions to reproduce bugs found by PSan. For each bug, PSan generates a log file (e.g., *CCEH-bug-1.log*) which contains PSan's suggestion on how the bug needs to be fixed. We analyzed suggested fixes by PSan for each bug in every benchmark and they are all listed in [PSan Bug Report](https://docs.google.com/spreadsheets/d/1-mdVpUVSlNed-QQhgMBEyxjSJC4wXgxgTOgvggVr-K4/edit?usp=sharing). In the bug report, we wrote down PSan's fix location, the variable causing the bug, and the main reason on the origin of the bug. The following steps show how to reproduce old bugs found by Jaaru, new bugs in RECIPE, new bugs in PMDK, and performance results to compare overhead of PSan vs. Jaaru: 
 
-1. Run *compare-jaarru.sh* script to regenerate bugs found by Jaaru and see how PSan can find those bugs and suggests the corresponding fixes for them. When it finishes successfully, it generates the corresponding output file for each bug in *~/results/compare-jaaru* directory. 
+1. Run *compare-jaarru.sh* script to regenerate bugs found by Jaaru and see how PSan can find those bugs and suggests the corresponding fixes for them. When it finishes successfully, it generates the corresponding output file for each bug in *~/results/recipe-jaaru-bugs* directory. 
 
 ```
 	vagrant@ubuntu-bionic:~$ ./compare-jaaru.sh
 ```
 
-After execution of this script,  *~/results/compare-jaaru* directory has the following content:
+After execution of this script,  *~/results/recipe-jaaru-bugs* directory has the following content:
 
 ```
     vagrant@ubuntu-bionic:~$ ls
