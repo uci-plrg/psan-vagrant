@@ -156,14 +156,226 @@ Evaluation and analysis for each of these bugs are listed in [PSan Bug Report](h
 
 Note that the performance results generated for the benchmarks can be different from the numbers that are reported in PSan's paper since there is non-determinism in scheduling threads; when stores, flushes, and fences leave the store buffer; and memory alignment in the malloc procedure. This non-determinism can possibly impact on the number of bugs reported in [PSan Bug Report](https://docs.google.com/spreadsheets/d/1-mdVpUVSlNed-QQhgMBEyxjSJC4wXgxgTOgvggVr-K4/edit?usp=sharing) or PSan's paper for RECIPE and PMDK benchmarks.
 
-## Disclaimer
+# Use PSan
+
+This section shows how to set up PSan on any Linux machine. Use the following step-by-step guidance to set up PSan and test any applications with it. In particular, this section describe commands in [setup.sh](https://github.com/uci-plrg/psan-vagrant/blob/master/data/setup.sh). This script can be used to setup PSan, RECIPE, PMDK, Redis, and Memcached in *home (~/)* directory of any Linux based machine. 
+
+## Dependencies
+
+To properly set up PSan and Our benchmarks, some packages are required. Use the following commands to install all the necessary dependencies:
+
+```
+apt-get update
+apt-get -y install cmake g++ clang pkg-config autoconf pandoc libevent-dev libseccomp-dev xsltproc
+```
+
+## Building PMCPass
+
+PSan is implemented on top of Jaaru model checker. Jaaru requires an LLVM pass (i.e., PMCPass) to annotate all memory and cache operations of your tool. You can download the binary file from [here](https://drive.google.com/drive/folders/1FH6uKohoSZXrf1Twq55ZUTI6DzNVYzts?usp=sharing) or build the PMCPass with LLVM. To build it you need to download LLVM and register our pass and build it:
+
+```
+git clone https://github.com/llvm/llvm-project.git
+git clone https://github.com/uci-plrg/jaaru-llvm-pass
+cd llvm-project
+git checkout 7899fe9da8d8df6f19ddcbbb877ea124d711c54b
+cd ../jaaru-llvm-pass
+git checkout vagrant
+cd ..
+mv jaaru-llvm-pass llvm-project/llvm/lib/Transforms/PMCPass
+```
+
+To register our pass in LLVM append *‘add_subdirectory(PMCPass)’* to *CMakeLists.txt* file in the *‘Transforms’* directory by using the following command:
+
+```
+echo "add_subdirectory(PMCPass)" >> llvm-project/llvm/lib/Transforms/CMakeLists.txt
+```
+
+After registering the pass, use the following commands to build the pass and LLVM:
+
+```
+cd llvm-project
+mkdir build
+cd build
+cmake -DLLVM_ENABLE_PROJECTS=clang -G "Unix Makefiles" ../llvm
+make
+```
+
+To verify the building process was successful, our pass can be found in the following directory:
+
+```
+touch llvm-project/build/lib/libPMCPass.so
+```
+
+## Setting up PSan
+
+This section shows how to set up PSan and use it to debug your tool. First, we need to checkout Jaaru, the underlying model checker, which contains PSan plugin. Then, use the following commands to build PSan:
+
+```
+cd ~/
+git clone https://github.com/uci-plrg/jaaru.git
+mv jaaru pmcheck
+cd pmcheck/
+git checkout psan
+# Setting LLVMDIR and JAARUDIR in wrapper scripts
+sed -i 's/LLVMDIR=.*/LLVMDIR=~\/llvm-project\//g' Test/gcc
+sed -i 's/JAARUDIR=.*/JAARUDIR=~\/pmcheck\/bin\//g' Test/gcc
+sed -i 's/LLVMDIR=.*/LLVMDIR=~\/llvm-project\//g' Test/g++
+sed -i 's/JAARUDIR=.*/JAARUDIR=~\/pmcheck\/bin\//g' Test/g++
+# Building test cases
+make test
+```
+
+PSan supports different APIs to access the persistent memory including [pmem](https://github.com/pmem/pmdk/) in PMDK library and volatile memory allocator ([libvmemmalloc](https://pmem.io/pmdk/manpages/linux/v1.3/libvmmalloc.3.html)). In PMDK there are separate APIs for allocating persistent memory. However, libvmemmalloc overrides normal malloc APIs to allocate memory on persistent memory instead of DRAM. If the tool-under-test uses libvmemmalloc, a flag needs to be set in PSan to activate the corresponding support. Otherwise, PSan supports pmem APIs by default. To enable libvmemmalloc, uncomment the following flag in ‘pmcheck/config.h’ file and recompile Jaaru:
+
+```
+//In config.h file uncomment the following line
+#define ENABLE_VMEM
+```
+
+The source code for PSan plugin can be found in *'Plugins'* directory in [pmverifier.cc](https://github.com/uci-plrg/jaaru/blob/pmrace/Plugins/pmverifier.cc). Jaaru is capable of being extended to implement different plugins for different analyses. To implement a new plugin, the [Analysis](https://github.com/uci-plrg/jaaru/blob/pmrace/Plugins/analysis.h) interface need to be implemnted. Then, similar to *PMVerifier*, enable it in [main.cc](https://github.com/uci-plrg/jaaru/blob/ac78a7a2fb0e7ddcadb38e0adcac7724ab034dfc/main.cc#L149) file.
+
+## Running PSan test cases
+
+PSan test cases are located in the *‘Test’* directory. To run them with PSan, we need to modify *‘run.sh’* script to become as follows:
+
+```
+#!/bin/bash
+export LD_LIBRARY_PATH=~/pmcheck/bin/
+# For Mac OSX
+export DYLD_LIBRARY_PATH=~/pmcheck/bin/
+export PMCheck="-o"
+echo $@
+$@
+```
+
+By using ‘PMCheck’ environment variable, we can set different options for Jaaru. To see a full list of Jaaru’s options, set PMCheck=”–help” and run the test cases. For example, to run ‘[testverifier](https://github.com/uci-plrg/jaaru/blob/psan/Test/testverifier.cc)‘ test case use the following commands:
+
+```
+cd ~/pmcheck
+make test
+cd bin
+./run.sh testverifier
+```
+
+*PMCheck=”-o”* enables PSan plugin in Jaaru. PSan support different strategies in dealing with robustness violations: 1) Naive: which reports the bug and continues exploring the execution 2) Exit: which exits the execution once it finds a violation 3) Safe: which forces to explore robustness-free stores for each load. By default, PSan choose Naive strategy. Other strategies can be selected by using ‘PMCheck’ variable. For example for choosing Exist strategy use:
+
+```
+export PMCheck="-o2"
+```
+
+PSan can operate in two different modes: 1) Random mode: which randomly selects and explore executions and 2) Model checking mode: which systematically insert crashes and explore executions. By default, Model Checking mode is selected for PSan. To enable model checking mode, we need to use “-x” option. For example, for activating random mode to exploring 100 random execution with Safe strategy, we need to run PSan with the following parameter:
+
+```
+export PMCheck="-o3 -x100"
+```
+
+## Running your tools
+
+To test your application with PSan, you need to compile your tool with PSan and our LLVM pass (i.e., PMCPass). To make this process easier, we use a coding pattern which is described as follows: If you check ‘pmcheck/Test’ directory, there are 4 scripting files g++, gcc, clang, and clang++. In each of these files, we define appropriate flags for the compiler. You can modify ‘LLVMDIR’ and ‘JAARUDIR’ environment variables in these files to point to the location of LLVM and Jaaru (i.e., PMCheck) on your machine. Then, modify the building system of your tool to use these script wrappers instead of the actual compilers. For example, your ‘~/pmcheck/Test/g++’ file can look like this:
+
+```
+LLVMDIR=~/llvm-project/
+CC=${LLVMDIR}/build/bin/clang++
+LLVMPASS=${LLVMDIR}/build/lib/libPMCPass.so
+JAARUDIR=~/pmcheck/bin/
+$CC -Xclang -load -Xclang $LLVMPASS -L${JAARUDIR} -lpmcheck -Wno-unused-command-line-argument -Wno-address-of-packed-member -Wno-mismatched-tags -Wno-unused-private-field -Wno-constant-conversion -Wno-null-dereference $@
+```
+
+To verify the script wrappers you can build our test cases without any errors:
+
+```
+cd ~/pmcheck/
+make test
+```
+
+## Exmaple: Debugging RECIPE
+
+We tested PSan on [RECIPE](https://github.com/utsaslab/RECIPE) benchmarks which we branched off [this commit version](https://github.com/utsaslab/RECIPE/commit/bab7b1f8d14e2a968285d89cac6b3dc7fddc5f5b) of the original repository. RECIPE uses libvmemmalloc to access persistent memory, so vmem flag has to be activated to debug this benchmark (See **Setting up PSan**). Here you can download the working version of the RECIPE that contains our bug fixes from our repository:
+
+```
+git clone https://github.com/uci-plrg/nvm-benchmarks
+cd nvm-benchmarks
+git checkout psan
+# Or use: git checkout e4bfded2cc4baddcd5e848beeb9cdc6641f1e955 
+cd RECIPE
+```
+
+To compile and run any benchmarks, you need to modify the Makefile to change the compiler to point to the corresponding wrapper script. For example in FAST_FAIR makefile add the following line to ‘Makefile’:
+
+```
+CXX=~/pmcheck/Test/g++
+```
+
+To run each test case, you need to modify the ‘run.sh’ file in ‘FAST_FAIR’ directory to look like the following:
+
+```
+#!/bin/bash
+export LD_LIBRARY_PATH=~/pmcheck/bin/
+export PMCheck="-o2"
+$@
+```
+
+Now you can run RECIPE benchmarks by using ‘run.sh’ script file. For instance, to run FAST_FAIR with two threads and 3 keys we use the following command:
+
+```
+./run.sh ./example 3 2
+```
+
+### Debugging with GDB
+
+PSan supports running under GDB to debug your program further. To use GDB, add ‘-g’ option to ‘CFLAGS‘ and ‘CPPFLAGS‘ variables in pmcheck/common.mk. Then recompile PSan and your tool and use gdb to run your program. For example, you can run FAST_FAIR example with gdb by using the following commands:
+
+```
+./run.sh gdb ./example
+(gdb) run 3 2
+```
+
+## Exmaple 2: Debugging PMDK
+
+We tested PSan on [PMDK](https://github.com/pmem/pmdk) benchmarks which we branched off [this commit version](https://github.com/pmem/pmdk/commit/9afe20553b44420ad3626a7335dafe3d34fdced7) of the original repository. PMDK test cases use libpmem to access persistent memory, so vmem flag has to be disabled to debug these test cases (See **Setting up PSan**). Here you can download the working version of the PMDK that contains our bug fixes from our repository:
+
+```
+git clone https://github.com/uci-plrg/jaaru-pmdk.git
+mv jaaru-pmdk pmdk
+cd pmdk
+git checkout psan
+# Or use: git checkout 1637c48c0d4c3884dbcfe7ca5d608b30cc98e31e
+```
+
+To compile and run PMDK test cases, you need to compile PMDK with setting flags to change the compiler to point to the corresponding wrapper script. For example PMDK can be compiled with the following command:
+
+```
+make EXTRA_CFLAGS_RELEASE="-ggdb -fno-omit-frame-pointer -O0" CC=~/pmcheck/Test/gcc CXX=~/pmcheck/Test/g++
+```
+
+To run each test case, you need to create the ‘run.sh’ file in ‘src/examples/libpmemobj/map/’ directory to look like the following:
+
+```
+#!/bin/bash
+export NDCTL_ENABLE=n
+export LD_LIBRARY_PATH=~/pmcheck/bin/:~/pmdk/src/debug
+# For Mac OSX
+export DYLD_LIBRARY_PATH=~/pmcheck/bin/
+export PMCheck="-d$3 -o -r1000"
+echo "./run.sh ./data_store <ctree|btree|rbtree|hashmap_atomic|hashmap_tx> ./path/to/file [number of inserts]"
+echo $@
+$@
+```
+
+Now you can run test cases by using ‘run.sh’ script file. For instance, to run *btree* with 2 inserts, we use the following command:
+
+```
+./run.sh ./data_store btree tmp.log 2
+```
+
+# Disclaimer
 
 We make no warranties that PSan is free of errors. Please read the paper and the README file so that you understand what the tool is supposed to do.
 
-## Contact
+# Contact
 
 Please feel free to contact us for more information. Bug reports are welcome, and we are happy to hear from our users. Contact Hamed Gorjiara at [hgorjiar@uci.edu](mailto:hgorjiar@uci.edu), Weiyu Luo at [weiyul7@uci.edu](mailto:weiyul7@uci.edu), Alex Lee at [leea19@uci.edu](mailto:leea19@uci.edu), Harry Xu at [harryxu@g.ucla.edu](mailto:harryxu@g.ucla.edu), or Brian Demsky at [bdemsky@uci.edu](mailto:bdemsky@uci.edu) for any questions about PSan. 
 
-## Copyright
+# Copyright
 
 Copyright &copy; 2022 Regents of the University of California. All rights reserved
