@@ -158,7 +158,7 @@ Note that the performance results generated for the benchmarks can be different 
 
 # Use PSan
 
-This section shows how to set up PSan on any Linux machine. Use the following step-by-step guidance to set up PSan and test any applications with it. In particular, this section describe commands in [setup.sh](https://github.com/uci-plrg/psan-vagrant/blob/master/data/setup.sh). This script can be used to setup PSan, RECIPE, PMDK, Redis, and Memcached in *home (~/)* directory of any Linux based machine. 
+This section shows how to set up PSan on any Linux machine. Use the following step-by-step guidance to set up PSan and test any applications with it. In particular, this section describe commands in [setup.sh](https://github.com/uci-plrg/psan-vagrant/blob/master/data/setup.sh). This script can be used to set up PSan, RECIPE, PMDK, Redis, and Memcached from their Github repositories in the *home (~/)* directory of any Linux based machine. 
 
 ## Dependencies
 
