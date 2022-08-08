@@ -232,7 +232,7 @@ PSan supports different APIs to access the persistent memory including [pmem](ht
 #define ENABLE_VMEM
 ```
 
-The source code for PSan plugin can be found in *'Plugins'* directory in [pmverifier.cc](https://github.com/uci-plrg/jaaru/blob/pmrace/Plugins/pmverifier.cc) file. Jaaru is capable of being extended to implement different plugins for different analyses. To add a new plugin or analysis, the [Analysis](https://github.com/uci-plrg/jaaru/blob/pmrace/Plugins/analysis.h) interface need to be implemnted. Then, similar to *PMVerifier*, add a flag in [main.cc](https://github.com/uci-plrg/jaaru/blob/ac78a7a2fb0e7ddcadb38e0adcac7724ab034dfc/main.cc#L149) file to enable the analysis at runtime.
+The source code for PSan plugin can be found in *'Plugins'* directory in [pmverifier.cc](https://github.com/uci-plrg/jaaru/blob/pmrace/Plugins/pmverifier.cc) file. Jaaru is capable of being extended to implement different plugins for different analyses. To add a new plugin or analysis, the [Analysis](https://github.com/uci-plrg/jaaru/blob/pmrace/Plugins/analysis.h) interface need to be implemented. Then, similar to *PMVerifier*, add a flag in [main.cc](https://github.com/uci-plrg/jaaru/blob/ac78a7a2fb0e7ddcadb38e0adcac7724ab034dfc/main.cc#L149) file to enable the analysis at runtime.
 
 ## Running PSan test cases
 
